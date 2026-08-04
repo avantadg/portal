@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Acceso Exclusivo - Biblioteca Digital VIP</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22',
+                        },
+                        avantaDark: {
+                            900: '#090d16',
+                            950: '#030712',
+                        },
+                        avantaAccent: {
+                            gold: '#fbbf24',
+                            cyan: '#06b6d4',
+                            teal: '#14b8a6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card-hover {
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(16, 185, 129, 0.35);
+            box-shadow: 0 16px 32px -10px rgba(16, 185, 129, 0.2);
+        }
+
+        .glass-input {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand-gradient-text {
+            background: linear-gradient(135deg, #ffffff 30%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-button-gradient {
+            background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+        }
+
+        .brand-button-gradient:hover {
+            background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);
+        }
+
+        /* Keyframe Entrance Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* Utility for touch devices horizontal scroll without scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white relative">
+
+    <!-- LOGIN SCREEN MODAL -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl">
+        <div class="glass-card max-w-md w-full rounded-3xl p-6 sm:p-8 border border-slate-800/90 shadow-2xl relative overflow-hidden text-center">
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-brand-500/15 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-center mb-5">
+                <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800/90 shadow-xl inline-flex items-center justify-center min-w-[70px] min-h-[70px]">
+                    <img src="https://lh3.googleusercontent.com/d/12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9=s1000" 
+                         alt="Avanta VIP Logo" 
+                         class="h-12 w-auto object-contain max-w-[180px]"
+                         onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9&sz=w1000';">
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-extrabold text-white tracking-tight">Acceso Privado VIP</h2>
+            <p class="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
+                Ingresa la contraseña de miembro para acceder a la biblioteca digital exclusiva de Avanta.
+            </p>
+
+            <form onsubmit="verificarPassword(event)" class="mt-6 space-y-4">
+                <div>
+                    <input type="password" id="password-input" placeholder="Ingresa la contraseña" class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all placeholder:text-slate-500 text-center tracking-wider">
+                </div>
+
+                <button type="submit" class="w-full py-3.5 px-4 brand-button-gradient text-slate-950 font-extrabold text-sm rounded-xl transition-all shadow-lg shadow-brand-950/60 flex items-center justify-center gap-2">
+                    <span>Ingresar al Portal VIP</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+
+                <p id="error-msg" class="text-rose-400 text-xs font-semibold hidden">
+                    Contraseña incorrecta. Inténtalo de nuevo.
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Background Ambient Orbs matching Avanta Palette -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[850px] h-[380px] bg-brand-600/12 rounded-full blur-[140px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 left-1/4 w-[550px] h-[320px] bg-teal-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed top-1/3 right-10 w-[420px] h-[420px] bg-cyan-600/8 rounded-full blur-[160px] pointer-events-none z-0"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" role="status" aria-live="polite" class="fixed top-6 right-4 sm:right-6 z-50 transform translate-y-[-100px] opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass-card bg-slate-900/95 border border-brand-500/40 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3">
+            <div id="toast-icon" class="p-1.5 rounded-lg bg-brand-500/20 text-brand-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <span id="toast-message" class="text-sm font-medium">Notificación</span>
+        </div>
+    </div>
+
+    <!-- NAVIGATION HEADER -->
+    <header class="w-full z-20 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-10 px-2.5 rounded-xl bg-slate-900/90 border border-slate-800/80 flex items-center justify-center shadow-md">
+                    <img src="https://lh3.googleusercontent.com/d/12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9=s1000" 
+                         alt="Avanta VIP Logo" 
+                         class="h-7 w-auto object-contain max-w-[140px]"
+                         onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9&sz=w1000';">
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">AVANTA <span class="text-brand-400 font-light">VIP</span></span>
+                    <span class="text-[10px] text-slate-400 tracking-wider font-medium uppercase mt-0.5">Portal de Miembros</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-300">
+                    <svg class="w-3.5 h-3.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span id="header-last-updated">Actualizado: --</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-500/10 text-brand-400 border border-brand-500/25">
+                    <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
+                    Acceso VIP
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <div class="z-10 flex-grow flex flex-col items-center p-4 sm:p-6 lg:p-8">
+
+        <!-- MAIN CONTENT AREA -->
+        <main id="main-content" class="max-w-6xl w-full py-4 sm:py-6">
+            
+            <!-- Hero Banner -->
+            <section class="glass-card rounded-3xl p-6 sm:p-8 border border-slate-800/90 mb-8 relative overflow-hidden">
+                <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-brand-500/12 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="max-w-2xl">
+                        <div class="flex flex-wrap items-center gap-2.5 mb-3">
+                            <div class="inline-flex items-center px-2.5 py-1 rounded-xl bg-slate-900/90 border border-slate-800">
+                                <img src="https://lh3.googleusercontent.com/d/12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9=s1000" 
+                                     alt="Avanta Logo" 
+                                     class="h-4 w-auto object-contain mr-2"
+                                     onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9&sz=w1000';">
+                                <span class="text-[11px] font-bold text-slate-300">AVANTA</span>
+                            </div>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-brand-500/15 text-brand-300 border border-brand-500/30">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
+                                Área Privada
+                            </span>
+                            <span id="hero-last-updated-badge" class="inline-flex items-center text-[11px] font-medium text-slate-400 bg-slate-900/80 px-2.5 py-0.5 rounded-full border border-slate-800">
+                                <!-- Dynamic Date Inserted Here -->
+                            </span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                            Biblioteca Digital de Recursos Exclusivos
+                        </h1>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2.5 leading-relaxed">
+                            Bienvenido a tu panel VIP. Explora y descarga tus paquetes exclusivos, guías de estudio y canales oficiales. Este repositorio se actualiza constantemente con nuevo contenido.
+                        </p>
+                    </div>
+
+                    <!-- Growth Status Badge -->
+                    <div class="flex items-center gap-3.5 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/90 self-start md:self-auto shrink-0 shadow-lg">
+                        <div class="p-3 bg-brand-500/15 rounded-xl text-brand-400 border border-brand-500/20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Estado del Portal</div>
+                            <div class="text-sm sm:text-base font-bold text-white flex items-center gap-2 mt-0.5">
+                                <span>Biblioteca en Crecimiento</span>
+                                <span class="flex h-2 w-2 relative">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-brand-400/90 font-medium mt-0.5">Actualizaciones Constantes</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Benefit Cards Section -->
+            <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 flex items-start gap-3">
+                    <div class="p-2 rounded-xl bg-brand-500/10 text-brand-400 border border-brand-500/20 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xs sm:text-sm font-bold text-white">Acceso Vitalicio</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Sin límites ni expiración</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 flex items-start gap-3">
+                    <div class="p-2 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xs sm:text-sm font-bold text-white">Recursos Exclusivos</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Materiales seleccionados VIP</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 flex items-start gap-3">
+                    <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xs sm:text-sm font-bold text-white">Actualizaciones</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Nuevos módulos periódicos</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 flex items-start gap-3">
+                    <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20H2v-2a3 3 0 015.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xs sm:text-sm font-bold text-white">Comunidad Privada</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Soporte directo e interacciones</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls Section: Search & Category Filters -->
+            <section class="mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                
+                <!-- Search Box -->
+                <div class="relative flex-1">
+                    <label for="search-input" class="sr-only">Buscar recurso</label>
+                    <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" id="search-input" onkeyup="filtrarContenido()" placeholder="Buscar por título, categoría o palabra clave..." class="glass-input w-full pl-10 pr-10 py-2.5 rounded-xl text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all placeholder:text-slate-500">
+                    <button id="clear-search-btn" onclick="limpiarBusqueda()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 rounded-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar" id="category-filters" role="tablist" aria-label="Filtro de Categorías">
+                    <button onclick="filtrarCategoria('all')" class="category-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-500 text-slate-950 transition-all shadow-md shadow-brand-950/40" data-category="all" role="tab" aria-selected="true">
+                        Todos
+                    </button>
+                    <button onclick="filtrarCategoria('Drive')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all" data-category="Drive" role="tab" aria-selected="false">
+                        Drive
+                    </button>
+                    <button onclick="filtrarCategoria('Documentos')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all" data-category="Documentos" role="tab" aria-selected="false">
+                        Documentos
+                    </button>
+                    <button onclick="filtrarCategoria('Cursos')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all" data-category="Cursos" role="tab" aria-selected="false">
+                        Cursos
+                    </button>
+                    <button onclick="filtrarCategoria('Comunidad')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all" data-category="Comunidad" role="tab" aria-selected="false">
+                        Comunidad
+                    </button>
+                </div>
+            </section>
+
+            <!-- Dynamic Resource Cards Container -->
+            <section id="links-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 min-h-[220px]" aria-live="polite"></section>
+
+            <!-- Empty Search State -->
+            <div id="empty-state" class="hidden text-center py-16 px-4 glass-card rounded-3xl border border-slate-800">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-200">No se encontraron resultados</h3>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
+                    No encontramos ningún recurso que coincida con tu búsqueda. Intenta con otros términos o cambia el filtro de categoría.
+                </p>
+                <button onclick="limpiarFiltrosCompletos()" class="mt-5 px-4 py-2 rounded-xl text-xs font-semibold text-brand-400 bg-brand-500/10 border border-brand-500/20 hover:bg-brand-500/20 transition-all">
+                    Restablecer Filtros
+                </button>
+            </div>
+
+            <!-- Coming Soon Section -->
+            <section class="mt-14 pt-10 border-t border-slate-900">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+                    <div>
+                        <div class="flex items-center gap-2 text-brand-400 text-xs font-bold tracking-wider uppercase mb-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                            En Desarrollo
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Próximas Adiciones</h2>
+                    </div>
+                    <p class="text-xs text-slate-400 sm:text-right max-w-xs">
+                        Trabajamos en nuevos módulos exclusivos. Se publicarán automáticamente en esta sección.
+                    </p>
+                </div>
+
+                <!-- Coming Soon Cards Grid with Images -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Card 1 -->
+                    <div class="group glass-card rounded-2xl overflow-hidden border border-slate-800/80 flex flex-col justify-between opacity-90 hover:opacity-100 transition-all duration-300">
+                        <div class="relative h-36 overflow-hidden bg-slate-900">
+                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop" 
+                                 alt="Curso Intensivo VIP" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                            <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-500/20 text-brand-300 border border-brand-500/30 backdrop-blur-md">
+                                Próximamente
+                            </span>
+                        </div>
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-white text-sm">Curso Intensivo VIP</h3>
+                                <p class="text-slate-400 text-xs mt-1 leading-relaxed">Módulo estratégico avanzado de implementación rápida.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-800/60 text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse"></span> En Producción
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="group glass-card rounded-2xl overflow-hidden border border-slate-800/80 flex flex-col justify-between opacity-90 hover:opacity-100 transition-all duration-300">
+                        <div class="relative h-36 overflow-hidden bg-slate-900">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop" 
+                                 alt="Nuevas Plantillas" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                            <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 backdrop-blur-md">
+                                Próximamente
+                            </span>
+                        </div>
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-white text-sm">Nuevas Plantillas</h3>
+                                <p class="text-slate-400 text-xs mt-1 leading-relaxed">Pack de diseños premium 100% editables en Canva.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-800/60 text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span> En Diseño
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="group glass-card rounded-2xl overflow-hidden border border-slate-800/80 flex flex-col justify-between opacity-90 hover:opacity-100 transition-all duration-300">
+                        <div class="relative h-36 overflow-hidden bg-slate-900">
+                            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop" 
+                                 alt="Herramientas & Scripts" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                            <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 backdrop-blur-md">
+                                Próximamente
+                            </span>
+                        </div>
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-white text-sm">Herramientas & Scripts</h3>
+                                <p class="text-slate-400 text-xs mt-1 leading-relaxed">Automatizaciones y flujos de trabajo optimizados.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-800/60 text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Planificado
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="group glass-card rounded-2xl overflow-hidden border border-slate-800/80 flex flex-col justify-between opacity-90 hover:opacity-100 transition-all duration-300">
+                        <div class="relative h-36 overflow-hidden bg-slate-900">
+                            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop" 
+                                 alt="Master Pack V2" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                            <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 backdrop-blur-md">
+                                Próximamente
+                            </span>
+                        </div>
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-white text-sm">Master Pack V2</h3>
+                                <p class="text-slate-400 text-xs mt-1 leading-relaxed">Segunda edición ampliada de activos digitales en HD.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-800/60 text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> En Recopilación
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="w-full border-t border-slate-900 bg-slate-950/90 py-6 z-10">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <img src="https://lh3.googleusercontent.com/d/12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9=s1000" 
+                     alt="Avanta Logo" 
+                     class="h-4 w-auto object-contain opacity-70"
+                     onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9&sz=w1000';">
+                <span>&copy; 2026 AVANTA VIP Portal. Todos los derechos reservados.</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="inline-flex items-center gap-1.5 text-slate-400">
+                    <svg class="w-3.5 h-3.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    Portal de Miembros Privado
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configurable Branding & Access Variables
+        const LOGO_DRIVE_ID = "12oK2VftkhnBFKXM8UVieJiS_X7ddNOi9";
+        const LOGO_URL = `https://lh3.googleusercontent.com/d/${LOGO_DRIVE_ID}=s1000`;
+        const LAST_UPDATED = "Agosto 2026";
+        const CLAVE_ACCESO = "avanta2026";
+
+        let currentCategory = 'all';
+
+        // Resource Data aligned with Avanta Visual Brand Colors
+        const linksData = [
+            { 
+                id: "1",
+                title: "PACK GALLETAS NEW YORK", 
+                category: "Drive",
+                description: "Recetas exclusivas, técnicas de horneado e ingredientes VIP.",
+                icon: "🍪", 
+                badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                badge: "DESTACADO",
+                image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?q=80&w=800&auto=format&fit=crop",
+                url: "https://drive.google.com/drive/folders/1tgTBd_Rdq3Inu4XiynBXdaMw5zffDICC?usp=drive_link" 
+            },
+            { 
+                id: "2",
+                title: "PACK VERSÍCULOS DE LA BIBLIA", 
+                category: "Documentos",
+                description: "Compilado de versículos categorizados para lectura y meditación.",
+                icon: "📖", 
+                badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+                badge: null,
+                image: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=800&auto=format&fit=crop",
+                url: "https://docs.google.com/document/d/1fG3vr5QbOwuYc9LkG_UU8NMJ7InmgnFp3QiytGVa0M8/edit?usp=drive_link" 
+            },
+            { 
+                id: "3",
+                title: "IMÁGENES Y VIDEOS", 
+                category: "Drive",
+                description: "Banco multimedia de alta definición libre para tus proyectos.",
+                icon: "📸", 
+                badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+                badge: "ACTUALIZADO",
+                image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop",
+                url: "https://drive.google.com/drive/folders/10W3fBp_9U2qhODfEOtpg47Agf5rBOC5p?usp=drive_link" 
+            },
+            { 
+                id: "4",
+                title: "+ 1000 EBOOKS VIP", 
+                category: "Drive",
+                description: "Biblioteca digital completa con títulos en diversos temas y nichos.",
+                icon: "📚", 
+                badgeColor: "bg-brand-500/10 text-brand-400 border-brand-500/20",
+                badge: "NUEVO",
+                image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=800&auto=format&fit=crop",
+                url: "https://drive.google.com/drive/folders/1I1EkzoVckSIeciptRC4xwZgrXVDImJWK?usp=drive_link" 
+            },
+            { 
+                id: "5",
+                title: "CERTIFICADO PLR", 
+                category: "Documentos",
+                description: "Licencia de derechos de reventa y plantilla editable en Canva.",
+                icon: "📜", 
+                badgeColor: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+                badge: null,
+                image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=800&auto=format&fit=crop",
+                url: "https://www.canva.com/design/DAHEapCMoCU/TG8q9R601WKxcanRHGF-3A/view?utm_content=DAHEapCMoCU&utm_campaign=designshare&utm_medium=link&utm_source=viewer" 
+            },
+            { 
+                id: "6",
+                title: "GRUPO OFICIAL WHATSAPP", 
+                category: "Comunidad",
+                description: "Comunidad oficial de soporte, novedades y comunicación directa.",
+                icon: "💬", 
+                badgeColor: "bg-teal-500/10 text-teal-400 border-teal-500/20",
+                badge: "DESTACADO",
+                image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop",
+                url: "https://chat.whatsapp.com/LJbSxVjM5uEIQFhYoLme4y?s=cl&p=a&mlu=0" 
+            },
+            { 
+                id: "7",
+                title: "CURSO VENTAS POR WHATSAPP", 
+                category: "Cursos",
+                description: "Guía completa para vender por WhatsApp: guiones, embudos y estrategias de cierre.",
+                icon: "🛒", 
+                badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+                badge: "NUEVO RECURSO",
+                image: "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=800&auto=format&fit=crop",
+                url: "https://avantadg.github.io/portalwsp/" 
+            }
+        ];
+
+        window.onload = function() {
+            // Check session storage for saved access
+            if (sessionStorage.getItem('avanta_vip_auth') === 'true') {
+                desbloquearAcceso();
+            }
+
+            // Set dynamic date values
+            document.getElementById('header-last-updated').textContent = `Actualizado: ${LAST_UPDATED}`;
+            document.getElementById('hero-last-updated-badge').textContent = `Última edición: ${LAST_UPDATED}`;
+            
+            // Render content
+            renderizarContenido(linksData);
+        };
+
+        function verificarPassword(event) {
+            if (event) event.preventDefault();
+            const input = document.getElementById('password-input');
+            const errorMsg = document.getElementById('error-msg');
+
+            if (input.value === CLAVE_ACCESO) {
+                sessionStorage.setItem('avanta_vip_auth', 'true');
+                desbloquearAcceso();
+            } else {
+                errorMsg.classList.remove('hidden');
+                input.value = '';
+                input.classList.add('border-rose-500');
+                setTimeout(() => input.classList.remove('border-rose-500'), 2000);
+            }
+        }
+
+        function desbloquearAcceso() {
+            const loginScreen = document.getElementById('login-screen');
+            if (loginScreen) {
+                loginScreen.classList.add('opacity-0', 'pointer-events-none', 'transition-opacity', 'duration-300');
+                setTimeout(() => {
+                    loginScreen.remove();
+                }, 300);
+            }
+        }
+
+        function renderizarContenido(lista) {
+            const container = document.getElementById('links-container');
+            const emptyState = document.getElementById('empty-state');
+
+            if (lista.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            container.innerHTML = lista.map((link, index) => {
+                // Generate optional badge HTML if badge is present
+                let optionalBadgeHTML = '';
+                if (link.badge) {
+                    let badgeStyles = 'bg-brand-500/20 text-brand-300 border-brand-500/30';
+                    if (link.badge === 'DESTACADO') {
+                        badgeStyles = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+                    } else if (link.badge === 'ACTUALIZADO') {
+                        badgeStyles = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+                    }
+                    optionalBadgeHTML = `
+                        <span class="text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full border ${badgeStyles} backdrop-blur-md">
+                            ${link.badge}
+                        </span>
+                    `;
+                }
+
+                return `
+                    <div class="group glass-card glass-card-hover rounded-2xl overflow-hidden border border-slate-800/90 flex flex-col justify-between animate-fade-in-up" style="animation-delay: ${index * 60}ms">
+                        
+                        <div>
+                            <!-- Card Image Banner -->
+                            <div class="relative h-44 overflow-hidden bg-slate-900 border-b border-slate-800/80">
+                                <img src="${link.image}" 
+                                     alt="${link.title}" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop';">
+                                
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+                                
+                                <div class="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                                    <span class="text-xl p-2 rounded-xl bg-slate-950/80 border border-slate-800/80 backdrop-blur-md shadow-md">
+                                        ${link.icon}
+                                    </span>
+                                    <div class="flex items-center gap-1.5">
+                                        ${optionalBadgeHTML}
+                                        <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${link.badgeColor} backdrop-blur-md">
+                                            ${link.category}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Body Content -->
+                            <div class="p-5">
+                                <h3 class="font-bold text-white text-base group-hover:text-brand-400 transition-colors leading-snug">
+                                    ${link.title}
+                                </h3>
+                                <p class="text-slate-400 text-xs mt-2 leading-relaxed">
+                                    ${link.description}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card Action Footer -->
+                        <div class="p-5 pt-0 mt-auto flex items-center justify-between gap-2">
+                            <button onclick="copiarEnlace('${link.url}', this)" aria-label="Copiar enlace de ${link.title}" class="px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>Copiar</span>
+                            </button>
+
+                            <a href="${link.url}" target="_blank" rel="noopener noreferrer" aria-label="Abrir recurso ${link.title}" class="px-4 py-2 text-xs font-extrabold text-slate-950 brand-button-gradient rounded-xl transition-all shadow-md shadow-brand-950/40 flex items-center gap-2 group/btn focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <span>Abrir Recurso</span>
+                                <svg class="w-3.5 h-3.5 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filtrarContenido() {
+            const input = document.getElementById('search-input');
+            const query = input.value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clear-search-btn');
+
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            
+            const filtrados = linksData.filter(item => {
+                const coincideCategoria = currentCategory === 'all' || item.category === currentCategory;
+                const coincideTexto = item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
+                return coincideCategoria && coincideTexto;
+            });
+
+            renderizarContenido(filtrados);
+        }
+
+        function limpiarBusqueda() {
+            const input = document.getElementById('search-input');
+            input.value = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            filtrarContenido();
+        }
+
+        function limpiarFiltrosCompletos() {
+            limpiarBusqueda();
+            filtrarCategoria('all');
+        }
+
+        function filtrarCategoria(cat) {
+            currentCategory = cat;
+            
+            // Update active button state
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                const isSelected = btn.dataset.category === cat;
+                btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+                if (isSelected) {
+                    btn.className = "category-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-500 text-slate-950 transition-all shadow-md shadow-brand-950/40";
+                } else {
+                    btn.className = "category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all";
+                }
+            });
+
+            filtrarContenido();
+        }
+
+        function copiarEnlace(url, btnElement) {
+            // Standard execCommand('copy') for iframe security compatibility
+            const tempInput = document.createElement('textarea');
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            // Button Visual Feedback
+            if (btnElement) {
+                const originalHTML = btnElement.innerHTML;
+                btnElement.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span class="text-brand-400 font-bold">¡Copiado!</span>
+                `;
+                btnElement.classList.add('border-brand-500/50', 'bg-brand-500/10');
+
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHTML;
+                    btnElement.classList.remove('border-brand-500/50', 'bg-brand-500/10');
+                }, 1800);
+            }
+
+            mostrarToast("¡Enlace copiado al portapapeles!", "success");
+        }
+
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            
+            toastMsg.textContent = mensaje;
+            
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+            }, 2800);
+        }
+    </script>
+</body>
+</html>
